@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="canvas" width="400" height="400"
+style="background-color:#000">
+</canvas>
+
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var radius = canvas.height / 2;
+var now = new Date();
+var hour = now.getHours();
+var minute = now.getMinutes();
+ctx.translate(radius, radius);
+radius = radius * 0.90;
+drawFace(ctx, radius);
+drawNumbers(ctx, radius);
+drawTime(ctx, radius, hour, minute);
+showTime(ctx, radius, hour, minute);
+
+
+function drawFace(ctx, radius) {
+
+  ctx.beginPath();
+  ctx.arc(0, 0, radius, 0, 2*Math.PI);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+
+
+  ctx.beginPath();
+  ctx.arc(0, 0, radius*0.05, 0, 2*Math.PI);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+}
+
+function drawNumbers(ctx, radius) {
+  var ang;
+  var num;
+  ctx.font = radius*0.15 + "px arial";
+  ctx.textBaseline="middle";
+  ctx.textAlign="center";
+  for(num = 1; num < 13; num++){
+    ang = num * Math.PI / 6;
+    ctx.rotate(ang);
+    ctx.translate(0, -radius*0.85);
+    ctx.rotate(-ang);
+    ctx.fillText(num.toString(), 0, 0);
+    ctx.rotate(ang);
+    ctx.translate(0, radius*0.85);
+    ctx.rotate(-ang);
+  }
+}
+
+
+function drawTime(ctx, radius, hour, minute) {
+
+  hour=(hour*Math.PI/6);
+  drawHand(ctx, hour, radius*0.5, radius*0.05);
+
+  minute=(minute*Math.PI/30);
+  drawHand(ctx, minute, radius*0.7, radius*0.05);
+  
+}
+
+function drawHand(ctx, pos, length, width) {
+  ctx.beginPath();
+  ctx.lineWidth = width;
+  ctx.moveTo(0,0);
+  ctx.rotate(pos);
+  ctx.lineTo(0, -length);
+  ctx.stroke();
+  ctx.rotate(-pos);
+}
+
+function calculateAngle(x,y) {
+  var theta;
+  if (y>200){
+    theta = Math.atan((x-200)/(200-y)) + Math.PI;
+  }
+  else{
+    theta = Math.atan((x-200)/(200-y)) ;
+    if (x<200){
+      theta = theta + 2*Math.PI;
+    }
+  }
+  return theta;
+}
+
+function showTime(ctx, radius, hour, min) {
+  hour = hour<10? ' '+ hour: hour.toString();
+  min = min<10? '0'+ min: min.toString();
+  var time = hour + ' : ' + min;
+  ang = Math.PI;
+  ctx.rotate(Math.PI);
+  ctx.translate(0, -radius*0.85);
+  ctx.rotate(-Math.PI);
+  ctx.fillText(time, 0, -200);
+  ctx.rotate(Math.PI);
+  ctx.translate(0, radius*0.85);
+  ctx.rotate(-Math.PI);
+}
+
+canvas.addEventListener('mousedown', function(evt) {
+  theta = calculateAngle(evt.clientX,evt.clientY);
+  minute = Math.round(theta/(2*Math.PI)*60)%60;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawFace(ctx, radius);
+  drawNumbers(ctx, radius);
+  drawTime(ctx, radius, hour, minute);
+  showTime(ctx, radius, hour, minute);
+
+  
+}, false);
+
+
+
+</script>
+
+</body>
+</html>
